@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "coverage>=7.16.1",
     "numpy>=2.5.2",
     "pytest>=9.1.1",
 ]

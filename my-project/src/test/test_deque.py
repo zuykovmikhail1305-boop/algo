@@ -1,5 +1,5 @@
 import pytest
-from my_project.deque import Deque_ended
+from my_project.data.deque import Deque_ended
 
 
 def test_add_right():

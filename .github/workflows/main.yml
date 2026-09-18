@@ -39,6 +39,6 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m pytest -v
+          python -m pytest my_project/test -v
         env:
           PYTHONPATH: ${{ github.workspace }}

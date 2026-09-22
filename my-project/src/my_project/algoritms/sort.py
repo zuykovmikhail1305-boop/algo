@@ -8,10 +8,11 @@ def buble_sort(arr):
 
             if arr[i] > arr[i + 1]:
 
-                rem = arr[i]
+                tmp = arr[i]
                 arr[i] = arr[i + 1]
-                arr[i + 1] = rem
+                arr[i + 1] = tmp
 
+                
             else:
                 continue
 
@@ -33,27 +34,74 @@ def hairbrush_sort(arr):
     return arr
 
 
+
 def choose_sort(arr):
 
-    new_arr = []
+    for i in range(len(arr)):
 
-    for _ in range(len(arr)):
-        min_count = float('inf')
-        idx = 0
+        min_value = arr[i]
+        idx = i
 
-        for i in range(len(arr)):
-            if arr[i] < min_count:
-                min_count = arr[i]
-                idx = i
+        for j in range(i,len(arr)):
 
-        new_arr.append(min_count)
-        del arr[idx]
-
-    return new_arr
-
-print(choose_sort(arr1))
+            if arr[j] < min_value:
+                min_value = arr[j]
+                idx = j
 
 
+        arr[i], arr[idx] = arr[idx], arr[i]
+
+    return arr
+
+
+
+def insert_sort(arr):
+
+    for i in range(1,len(arr)):
+
+        val = arr[i]
+        idx = i
+
+        while idx > 0 and arr[idx - 1] > val:
+
+            arr[idx], arr[idx -  1] = arr[idx - 1], arr[idx]
+            idx -= 1
+
+    return arr
+
+
+def quick_sort(arr):
+    if len(arr) <= 1:
+        return arr
+
+    pivot = arr[len(arr)//2]
+
+    low = [i for i in arr if i < pivot]
+    mid = [i for i in arr if i == pivot]
+    high = [i for i in arr if i > pivot]
+
+    return quick_sort(low) + mid + quick_sort(high)
+
+
+
+    
+
+
+
+
+        
+    
+
+        
+
+
+        
+        
+
+    
+
+
+    
         
              
 

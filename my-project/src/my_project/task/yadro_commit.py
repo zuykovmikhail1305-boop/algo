@@ -12,14 +12,13 @@ class Core():
         if len(self.commit) == 0:
             self.commit.append(value)
 
-        else:
-            if value < self.commit[0]:
-                self.commit.insert(value, 0)
-            else:
-                for i in range(1,len(self.commit)):
-                    if self.commit[i - 1] <= value < self.commit[i]:
-                        self.commit.insert(value, i)
-                        break
+        else:    
+            self.commit.insert(value, 0)
+            for i in range(1, len(self.commit)):
+
+                if self.commit[i - 1] <= self.commit[0] < self.commit[i]:
+                    self.commit.insert(self.commit[0], i)
+                    del(self.commit[0])
 
 
     def _make_range(self):
@@ -40,10 +39,10 @@ class Core():
             else:
 
                 if flag == False:
-                    tmp.append(self.commit[i])
+                    tmp_arr.append(self.commit[i])
 
                 else:
-                    tmp.append(self.commit[i])
+                    tmp_arr.append(self.commit[i])
                     self.kesh[tmp] = self.commit[i]
 
             return tmp_arr
@@ -68,3 +67,21 @@ class Core():
         self.kesh = dict()
 
 
+    def show(self):
+        print('core', self.core)
+        print('commit', self.commit)
+
+
+core = Core()
+
+core.add(10)
+core.show()
+core.add(20)
+core.show()
+core.add(15)
+core.show()
+core.add(40)
+core.show()
+core.add(30)
+core.make_commit()
+core.show()

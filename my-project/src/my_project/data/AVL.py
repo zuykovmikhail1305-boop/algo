@@ -4,6 +4,8 @@ class Node():
         self.right = None
         self.left = None
         self.root = None
+        self.height = 0
+        self.wieght = 0
 
 class BinarySearchTree():
     def __init__(self):
@@ -24,17 +26,42 @@ class BinarySearchTree():
                 node.left == Node()
                 node.left.value = value
                 node.left.root = node
-            else:
+                self._update_hieght(node.left, 1)
+                check = self._check_balance(node.left)
                 self._insert_recursive(node.left, value)
+                
         if value > node.value:
             if node.right == None:
                 node.right == Node()
                 node.right.value = value
                 node.right.root = node
+                self._update_hieght(node.left, 1)
+                check = self._check_balance(node.left)
             else:
                 self._insert_recursive(node.right, value)
 
-    
+    def _update_hieght(self, node, new_height):
+        if node.root.height < new_height:
+            node.root.height = new_height
+            self._update_hieght(node.root, new_height + 1)
+
+
+    def _check_balance(self, node):
+        left = 0 if node.left is None else node.left.heigt
+        right = 0 if node.right is None else node.right.heigt
+
+        if abs(left - right) <= 1:
+            if node.root == None:
+                return abs(left - right)
+            else:
+                self._check_balance(node.root)
+        else:
+            return left - right
+
+    def _right_small_turn(self, node):
+        pass
+
+
     def search(self, value):
         if self.head.value == value:
             return self.head
@@ -61,6 +88,7 @@ class BinarySearchTree():
             else:
                 self._search_recursive(node.right, value)
 
+    
     def _min_right(self, node):
         if node.right == None:
             node.root.right = None
@@ -146,6 +174,7 @@ class BinarySearchTree():
             self._postoreder(node.right, results)
             results.append(node.value)
 
+    
     def level_order(self):
         result = []
         result.append(self.head.value) 

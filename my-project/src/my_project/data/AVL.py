@@ -7,7 +7,7 @@ class Node():
         self.height = 0
         self.wieght = 0
 
-class BinarySearchTree():
+class AVL():
     def __init__(self):
         self.head = None
 

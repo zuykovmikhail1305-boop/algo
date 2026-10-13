@@ -87,37 +87,35 @@ class Deque_ended():
         print(self.arr)
 
 
-d = Deque_ended(10)
+if __name__ == "__main__":
+    d = Deque_ended(10)
 
-r = 1
-l = -1
-while True:
-    print("""====================
+    r = 1
+    l = -1
+    while True:
+        print("""====================
     1 - add_right()
     2 - add_left()
     3 - pop_right()
     4 - pop_left()""")
 
-    a = input()
-    if a == '1':
-        d.add_right(r)
-        r += 1
-        d.pr()
-    elif a == '2':
-        d.add_left(l)
-        l -= 1
-        d.pr()
-    elif a == '3':
-        d.pop_right()
-        r -= 1
-        d.pr()
-    elif a == '4':
-        d.pop_left()
-        l += 1
-        d.pr()
-    else:
-        print('Введите индекс')
-        print(d[int(input())])
-
-
-    
+        a = input()
+        if a == '1':
+            d.add_right(r)
+            r += 1
+            d.pr()
+        elif a == '2':
+            d.add_left(l)
+            l -= 1
+            d.pr()
+        elif a == '3':
+            d.pop_right()
+            r -= 1
+            d.pr()
+        elif a == '4':
+            d.pop_left()
+            l += 1
+            d.pr()
+        else:
+            print('Введите индекс')
+            print(d[int(input())])

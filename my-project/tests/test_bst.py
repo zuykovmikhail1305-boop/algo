@@ -101,3 +101,169 @@ def test_delete_everything(tree):
     for v in VALUES:
         tree.delete(v)
     assert tree.inorder() == []
+
+
+def assert_valid(t):
+    # каждый узел лежит в своих границах, а .root указывает на настоящего родителя
+    def walk(node, parent, low, high):
+        if node is None:
+            return
+        assert node.root is parent, f"у узла {node.value} неверный .root"
+        assert (low is None or node.value > low) and (high is None or node.value < high), (
+            f"узел {node.value} нарушает порядок дерева"
+        )
+        walk(node.left, node, low, node.value)
+        walk(node.right, node, node.value, high)
+
+    walk(t.head, None, None, None)
+
+
+def build(values):
+    t = BST()
+    for v in values:
+        t.insert(v)
+    return t
+
+
+def test_tree_is_valid_after_insert(tree):
+    assert_valid(tree)
+
+
+@pytest.mark.parametrize("method", ["inorder", "preroder", "postorder", "level_order"])
+def test_traversals_of_empty_tree(method):
+    assert getattr(BST(), method)() == []
+
+
+def test_level_order_single_node():
+    assert build([1]).level_order() == [1]
+
+
+def test_level_order_unbalanced():
+    #   4
+    #  / \
+    # 2   6
+    #      \
+    #       7
+    #        \
+    #         8
+    assert build([4, 2, 6, 7, 8]).level_order() == [4, 2, 6, 7, 8]
+
+
+def test_delete_missing_value_changes_nothing(tree):
+    tree.delete(42)
+    assert tree.inorder() == sorted(VALUES)
+    assert_valid(tree)
+
+
+def test_delete_from_empty_tree():
+    t = BST()
+    t.delete(1)
+    assert t.head is None
+
+
+def test_delete_only_node():
+    t = build([1])
+    t.delete(1)
+    assert t.head is None
+    assert t.inorder() == []
+
+
+def test_delete_root_with_only_right_child():
+    t = build([1, 2, 3])
+    t.delete(1)
+    assert t.head.value == 2
+    assert t.inorder() == [2, 3]
+    assert_valid(t)
+
+
+def test_delete_root_with_only_left_child():
+    t = build([3, 2, 1])
+    t.delete(3)
+    assert t.head.value == 2
+    assert t.inorder() == [1, 2]
+    assert_valid(t)
+
+
+def test_delete_right_leaf_when_parent_has_no_left():
+    t = build([1, 2])
+    t.delete(2)
+    assert t.inorder() == [1]
+    assert t.head.right is None
+
+
+def test_delete_left_leaf_when_parent_has_no_right():
+    t = build([2, 1])
+    t.delete(1)
+    assert t.inorder() == [2]
+    assert t.head.left is None
+
+
+def test_delete_node_with_only_left_child(tree):
+    tree.delete(9)
+    tree.delete(8)  # у 8 остался только левый ребёнок 7
+    assert tree.inorder() == [1, 3, 4, 5, 7]
+    assert tree.head.right.value == 7
+    assert_valid(tree)
+
+
+def test_delete_successor_with_right_child():
+    #     5
+    #    / \
+    #   2   8
+    #      / \
+    #     6   9
+    #      \
+    #       7
+    t = build([5, 2, 8, 6, 9, 7])
+    t.delete(5)  # на место 5 встаёт 6, а его ребёнок 7 — на место 6
+    assert t.head.value == 6
+    assert t.inorder() == [2, 6, 7, 8, 9]
+    assert_valid(t)
+
+
+def test_parent_links_after_deletes(tree):
+    tree.delete(3)
+    tree.delete(8)
+    assert_valid(tree)
+    tree.delete(4)
+    tree.delete(9)
+    assert_valid(tree)
+    assert tree.inorder() == [1, 5, 7]
+
+
+def test_deleted_value_is_not_found(tree):
+    tree.delete(8)
+    assert not tree.search(8)
+    for v in [1, 3, 4, 5, 7, 9]:
+        assert tree.search(v).value == v
+
+
+def test_insert_after_delete(tree):
+    tree.delete(8)
+    tree.insert(8)
+    tree.insert(6)
+    assert tree.inorder() == [1, 3, 4, 5, 6, 7, 8, 9]
+    assert_valid(tree)
+
+
+def test_delete_everything_in_other_order(tree):
+    for v in [1, 9, 3, 7, 5, 4, 8]:
+        tree.delete(v)
+        assert_valid(tree)
+    assert tree.head is None
+
+
+def test_random_inserts_and_deletes():
+    import random
+
+    rng = random.Random(7)
+    for _ in range(100):
+        values = rng.sample(range(100), rng.randint(1, 30))
+        t = build(values)
+        alive = set(values)
+        for v in rng.sample(values, len(values)):
+            t.delete(v)
+            alive.discard(v)
+            assert t.inorder() == sorted(alive), (values, v)
+            assert_valid(t)
+        assert t.head is None

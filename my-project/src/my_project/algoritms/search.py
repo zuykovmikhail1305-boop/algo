@@ -1,22 +1,22 @@
-from math import log
-
 def binary_search(arr, value):
+
+    arr.sort()
 
     l = 0
     r = len(arr)
-    n = log(r)
 
-    for i in range(n):
+    while l < r:
 
-        search = arr[(r-l)//2] 
+        mid = (r-l)//2
+        search = arr[l +mid] 
 
         if search == value:
             return value
 
         else:
             if value > search:
-                l = (r-l)//2
-            else:
-                r = (r-l)//2
+                l = l + mid + 1
+            if value < search:
+                r = l + mid
 
     return False

@@ -1,11 +1,15 @@
+from collections import deque
+
+
+
 class Node():
-    def __init__(self, value):
+    def __init__(self, value = None):
         self.value = value
         self.right = None
         self.left = None
         self.root = None
-        self.height = 0
-        self.wieght = 0
+        self.depht = 0
+
 
 class AVL():
     def __init__(self):
@@ -14,8 +18,7 @@ class AVL():
 
     def insert(self, value):
         if self.head == None:
-            self.head = Node()
-            self.head.value = value
+            self.head = Node(value)
         else:
             self._insert_recursive(self.head, value)
          
@@ -23,117 +26,180 @@ class AVL():
     def _insert_recursive(self, node, value):
         if value < node.value:
             if node.left == None:
-                node.left == Node()
-                node.left.value = value
+                node.left = Node(value)
                 node.left.root = node
-                self._update_hieght(node.left, 1)
-                check = self._check_balance(node.left)
+                self._add_depht(1, node)
+                self._small_check_depht(node)
+                self._new_depht(self.head)
+            else:
                 self._insert_recursive(node.left, value)
-                
         if value > node.value:
             if node.right == None:
-                node.right == Node()
-                node.right.value = value
+                node.right = Node(value)
                 node.right.root = node
-                self._update_hieght(node.left, 1)
-                check = self._check_balance(node.left)
+                self._add_depht(1, node)
+                self._small_check_depht(node)
+                self._new_depht(self.head)
             else:
                 self._insert_recursive(node.right, value)
 
-    def _update_hieght(self, node, new_height):
-        if node.root.height < new_height:
-            node.root.height = new_height
-            self._update_hieght(node.root, new_height + 1)
+
+    def _add_depht(self, depht, node):
+        if depht > node.depht:
+            node.depht = depht
+            if node.root != None:
+                self._add_depht(depht + 1, node.root)
 
 
-    def _check_balance(self, node):
-        left = 0 if node.left is None else node.left.heigt
-        right = 0 if node.right is None else node.right.heigt
+    def _new_depht(self, node):
 
-        if abs(left - right) <= 1:
-            if node.root == None:
-                return abs(left - right)
-            else:
-                self._check_balance(node.root)
+        if node == None:
+            return -1
+
+        left_depht = self._new_depht(node.left)
+        right_depht = self._new_depht(node.right)
+
+        node.depht = 1 + max(left_depht, right_depht)
+        return 1 + max(left_depht, right_depht)
+
+
+    def _small_check_depht(self, node):
+        left_depht = node.left.depht if node.left != None else -1
+        right_depht = node.right.depht if node.right != None else -1
+        depht_diff = left_depht - right_depht
+
+        if depht_diff in [-1, 0, 1]:
+            if node.root != None:
+                self._small_check_depht(node.root)
         else:
-            return left - right
+            if depht_diff < -1:
+                self._left_rotate(node)
+            if depht_diff > 1:
+                self._right_rotate(node)
 
-    def _right_small_turn(self, node):
-        pass
-
-
+    
     def search(self, value):
-        if self.head.value == value:
-            return self.head
+        if self.head == None:
+            return False
         else:
-            self._search_recursive(self.head.value)
+            if self.head.value == value:
+                return self.head
+            else:
+                return self._search_recursive(self.head, value)
 
 
     def _search_recursive(self, node, value):
+        if node == None:
+            return False
+        
         if value < node.value:
-            
-            if node.left.value == value:
-                return node.left
-            elif node.left.value == None:
+
+            if node.left == None:
                 return False
+            elif node.left.value == value:
+                    return node.left
             else:
-                self._search_recursive(node.left, value)
+                return self._search_recursive(node.left, value)
         
         if value > node.value:
-            
-            if node.right.value == value:
-                return node.right
-            elif node.right.value == None:
-                return False
-            else:
-                self._search_recursive(node.right, value)
 
-    
+            if node.right == None:
+                return False
+            elif node.right.value == value:
+                return node.right
+            else:
+                return self._search_recursive(node.right, value)
+
+
     def _min_right(self, node):
-        if node.right == None:
-            node.root.right = None
-            return node.value
+        if node.left == None:
+            tmp = node
+            node.root.right = tmp.right
+            if tmp.right != None:
+                tmp.right.root = node.root
+            return tmp.value
         else:
-            self._min_right(node.right)
-    
-    
+            return self._min_right_recursive(node.left)
+
+            
+    def _min_right_recursive(self, node):
+        if node.left == None:
+            tmp = node
+            if tmp.right != None:
+                node.root.left = tmp.right
+                tmp.right.root = node.root
+            else:
+                node.root.left = None
+            return tmp.value
+        else:
+            return self._min_right_recursive(node.left)
+
+
     def delete(self, value):
         for_delete = self.search(value)
-        self._delete(for_delete)
+        if for_delete == False:
+            return False
+        else:
+            self._delete(for_delete)
         
 
     def _delete(self, node):
 
-        if node.right == None and node.left == None:
-            root = node.root
+        root = node.root
+        if root == None and (node.right == None or node.left == None):
+            if node.right != None:
+                self.head = node.right
+                self.head.root = None
 
-            if root.left.value == node.value:
-                node = None
-                root.left = None
-            
-            if root.right.value == node.value:
-                node = None
-                root.right = None
+            elif node.left != None:
+                self.head = node.left
+                self.head.root = None
 
-        elif node.right != None and node.left == None:
+            else:
+                self.head = None
 
-                if root.left.value == node.value:
-                    root.left = node.right
 
-                if root.right.value == node.value:
-                    root.right = node.right
-        
-        elif node.right == None and node.left != None:
-
-                if root.left.value == node.value:
-                    root.left = node.left
-
-                if root.right.value == node.value:
-                    root.right = node.left
+        elif root == None and node.right != None and node.left != None:
+            new_value = self._min_right(node.right)
+            node.value = new_value
+            node.root = None
 
         else:
-            min_right = self._min_right(node)
-            node.value = min_right
+            if node.right == None and node.left == None:
+            
+                if root.left and root.left.value == node.value:
+                    node = None
+                    root.left = None
+                
+                if root.right and node != None and root.right.value == node.value:
+                    node = None
+                    root.right = None
+                
+
+            elif node.right != None and node.left == None:
+            
+
+                if root.left and root.left.value == node.value:
+                    root.left = node.right
+                    root.left.root = root
+
+                if root.right and node != None and root.right.value == node.value:
+                    root.right = node.right
+                    root.right.root = root
+            
+            elif node.right == None and node.left != None:
+        
+                if root.left and root.left.value == node.value:
+                    root.left = node.left
+                    root.left.root = root
+
+                if root.right and node != None and root.right.value == node.value:
+                    root.right = node.left
+                    root.right.root = root
+
+            else:
+                min_right = self._min_right(node.right)
+                node.value = min_right
 
 
     def inorder(self):
@@ -157,7 +223,7 @@ class AVL():
 
     def _preoder(self, node, results):
         if node:
-            results.append(node.values)
+            results.append(node.value)
             self._preoder(node.left, results)
             self._preoder(node.right, results)
 
@@ -174,19 +240,122 @@ class AVL():
             self._postoreder(node.right, results)
             results.append(node.value)
 
-    
     def level_order(self):
+        
         result = []
-        result.append(self.head.value) 
-        self._level_oreder(self.head, result)
+
+        if self.head == None:
+            return result
+
+        queue = deque()
+        queue.append(self.head)
+
+        while queue:
+            node = queue.popleft()
+            result.append(node.value)
+
+            if node.left:
+                queue.append(node.left) 
+
+            if node.right:
+                queue.append(node.right)       
+
         return result
 
+    def _right_rotate(self, node):
+        if node.root == None:
+            self.head = node.left
+            self.head.root = None
 
-    def _lever_order(self, node, result):
-        if node.left:
-            result.append(node.left.value)
-            self._level_order(node.left, result)
-        if node.right:
-            result.append(node.right.value)
-            self._level_order(node.right, result)
-             
+            tmp = self.head.right
+            
+            self.head.right = node
+            node.root = self.head
+            
+            node.left = tmp
+
+            if tmp != None:
+                tmp.root = node
+
+        else:
+            root = node.root
+            
+            site = True if root.left != None and node.value == root.left.value else False
+
+            if site:
+                root.left = node.left
+                root.left.root = root
+                
+                tmp = root.left.right
+                
+                root.left.right = node
+                node.root = root.left
+                
+                node.left = tmp
+     
+                if tmp != None:
+                    tmp.root = node
+
+            else:
+                root.right = node.left
+                root.right.root = root
+                
+                tmp = root.right.right
+                
+                root.right.right = node
+                node.root = root.right
+                
+                node.left = tmp
+
+                if tmp != None:
+                    tmp.root = node
+
+
+    def _left_rotate(self, node):
+        if node.root == None:
+            self.head = node.right
+            self.head.root = None
+            
+            tmp = self.head.left
+            
+            self.head.left = node
+            node.root = self.head
+            
+            node.right = tmp
+
+            if tmp != None:
+                tmp.root = node
+
+        else:
+
+            root = node.root
+
+            site = True if root.left != None and node.value == root.left.value else False
+
+            if site:
+                root.left = node.right
+                root.left.root = root
+                
+                tmp = root.left.left
+                
+                root.left.left = node
+                node.root = root.left
+                
+                node.right = tmp
+
+                if tmp != None:
+                    tmp.root = node
+
+            else:
+                root.right = node.right
+                root.right.root = root
+                
+                tmp = root.right.left
+                
+                root.right.left = node
+                node.root = root.right
+                
+                node.right = tmp
+
+                if tmp != None:
+                    tmp.root = node

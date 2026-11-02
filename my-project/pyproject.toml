@@ -9,7 +9,9 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "coverage>=7.16.1",
+    "matplotlib>=3.11.2",
     "numpy>=2.5.2",
+    "pydantic>=2.14.2",
     "pytest>=9.1.1",
 ]
 

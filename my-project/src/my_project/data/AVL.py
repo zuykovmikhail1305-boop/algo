@@ -29,6 +29,8 @@ class AVL():
                 node.left = Node(value)
                 node.left.root = node
                 self._add_depht(1, node)
+                self._big_check_depht(node)
+                self._new_depht(self.head)
                 self._small_check_depht(node)
                 self._new_depht(self.head)
             else:
@@ -38,6 +40,8 @@ class AVL():
                 node.right = Node(value)
                 node.right.root = node
                 self._add_depht(1, node)
+                self._big_check_depht(node)
+                self._new_depht(self.head)
                 self._small_check_depht(node)
                 self._new_depht(self.head)
             else:
@@ -63,19 +67,49 @@ class AVL():
         return 1 + max(left_depht, right_depht)
 
 
-    def _small_check_depht(self, node):
-        left_depht = node.left.depht if node.left != None else -1
-        right_depht = node.right.depht if node.right != None else -1
-        depht_diff = left_depht - right_depht
+    def _big_check_depht(self, node):
+        if node != None:
+            left_depht = node.left.depht if node.left != None else -1
+            right_depht = node.right.depht if node.right != None else -1
+            depht_diff = left_depht - right_depht
+    
+            if depht_diff in [-1, 0, 1]:
+                if node.root != None:
+                    self._big_check_depht(node.root)
 
-        if depht_diff in [-1, 0, 1]:
-            if node.root != None:
-                self._small_check_depht(node.root)
-        else:
-            if depht_diff < -1:
-                self._left_rotate(node)
-            if depht_diff > 1:
-                self._right_rotate(node)
+            elif depht_diff < -1:
+                child = node.right                     
+                child_left = child.left.depht if child.left != None else -1
+                child_right = child.right.depht if child.right != None else -1
+
+                if child_left > child_right:
+                    self._right_rotate(child)
+                    self._left_rotate(node)
+
+            else:
+                child = node.left
+                child_left = child.left.depht if child.left != None else -1
+                child_right = child.right.depht if child.right != None else -1
+
+                if child_right > child_left:
+                    self._left_rotate(child)
+                    self._right_rotate(node)
+
+
+    def _small_check_depht(self, node):
+        if node != None:
+            left_depht = node.left.depht if node.left != None else -1
+            right_depht = node.right.depht if node.right != None else -1
+            depht_diff = left_depht - right_depht
+    
+            if depht_diff in [-1, 0, 1]:
+                if node.root != None:
+                    self._small_check_depht(node.root)
+            else:
+                if depht_diff < -1:
+                    self._left_rotate(node)
+                if depht_diff > 1:
+                    self._right_rotate(node)
 
     
     def search(self, value):
@@ -200,6 +234,12 @@ class AVL():
             else:
                 min_right = self._min_right(node.right)
                 node.value = min_right
+
+        self._new_depht(self.head)
+        self._big_check_depht(root)
+        self._new_depht(self.head)
+        self._small_check_depht(root)
+        self._new_depht(self.head)
 
 
     def inorder(self):

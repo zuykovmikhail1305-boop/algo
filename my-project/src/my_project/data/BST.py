@@ -2,7 +2,7 @@ from collections import deque
 
 
 
-class Node():
+class Node:
     def __init__(self, value = None):
         self.value = value
         self.right = None
@@ -10,7 +10,7 @@ class Node():
         self.root = None
 
 
-class BST():
+class BST:
     def __init__(self):
         self.head = None
 

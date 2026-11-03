@@ -2,7 +2,7 @@ from collections import deque
 
 
 
-class Node():
+class Node:
     def __init__(self, value = None):
         self.value = value
         self.right = None
@@ -11,7 +11,7 @@ class Node():
         self.depht = 0
 
 
-class AVL():
+class AVL:
     def __init__(self):
         self.head = None
 
@@ -320,7 +320,7 @@ class AVL():
         else:
             root = node.root
             
-            site = True if root.left != None and node.value == root.left.value else False
+            site = bool(root.left != None and node.value == root.left.value)
 
             if site:
                 root.left = node.left

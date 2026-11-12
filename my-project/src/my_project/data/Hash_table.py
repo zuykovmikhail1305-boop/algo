@@ -1,46 +1,34 @@
-from hashlib import md5
+
 
 class Hash_table:
     def __init__(self, size = 8):
         self.size = size
-        self.values = []
-        self.table = [None] * self.size
+        self.table = [[] for _ in range(self.size)]
         self._occupancy = 0
 
 
-    def _count_hash(self, value):
-        return value % self.size
+    def _count_hash(self, key):
+        return key % self.size
 
 
-    def _new_table(self):   
-        self.size = self.size * 2
-        self.table = [None] * self.size
+    def put(self, key, value):
+        hash = self._count_hash(key)
+        self.table[hash].append((key, value))
 
-        for i in self.values:
-            self.table[self._count_hash(i)] = i
-
-
-    def put(self, value):
-        if self._occupancy / self.size > 0.75:
-            self._new_table()
-
-        hash = self._count_hash(value)
-
-        if self.table[hash] == value:
-            pass
-        elif self.table[hash] != None:
-            self._new_table()
-            self.put(value)
-        else:
-            self.table[hash] = value
-            self.values.append(value)
-            self._occupancy += 1
 
     def get(self, key):
-        return self.table[key]
+
+        hash = self._count_hash(key)
+        for i in self.table[hash]:
+            if i[0] == key:
+                return i[1]
 
     def remove(self, key):
-        self.table[key] = None
+        
+        hash = self._count_hash(key)
+        for i in range(len(self.table[hash])):
+            if self.table[hash][i][0] == key:
+                self.table[hash].pop(i)
 
     def p(self):
         print(self.table)
@@ -48,9 +36,13 @@ class Hash_table:
 
 
 h = Hash_table()
-h.put(8)
-h.put(90)
-h.put(9)
-h.put(16)
 h.p()
+h.put(8, 1)
+h.put(90, 2)
+h.put(9, 3)
+h.put(16, 4)
+print(h.get(16))
+h.remove(16)
+h.p()
+
 

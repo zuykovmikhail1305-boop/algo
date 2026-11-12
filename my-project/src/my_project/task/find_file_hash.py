@@ -27,16 +27,18 @@ def main():
             with open(file=filepath, mode = 'rb') as data_file:
                 data = data_file.read()
             for algo in config.hash:
-                if algo == 'md5':
-                    hash_value = hashlib.md5(data).hexdigest()
-                    print(hash_value)
-                elif algo == 'sha1':
-                    hash_value = hashlib.sha1(data).hexdigest()
-                    print(hash_value)
-                elif algo == 'sha2':
-                    hash_value = hashlib.sha256(data).hexdigest()
-                    print(hash_value)
+                match algo:
+                    case 'md5':
+                        hash_value = hashlib.md5(data).hexdigest()
+                        print(hash_value)
+                    case 'sha1':
+                        hash_value = hashlib.sha1(data).hexdigest()
+                        print(hash_value)
+                    case 'sha2':
+                        hash_value = hashlib.sha256(data).hexdigest()
+                        print(hash_value)
                 index[hash_value] = filepath
+                #сделать паттерн матчинг
 
 
     input_line = ''
